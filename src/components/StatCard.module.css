@@ -1,0 +1,38 @@
+.card {
+  background-color: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 500;
+  margin: 0;
+}
+
+.valueContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.value.negative {
+  color: var(--danger);
+}
+
+.highlight {
+  font-size: 13px;
+  color: var(--danger);
+  font-weight: 500;
+}

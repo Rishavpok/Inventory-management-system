@@ -1,0 +1,86 @@
+.tableContainer {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  background-color: var(--bg-color);
+  padding: 16px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-light);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.lowStockRow {
+  background-color: #fef2f2;
+}
+
+.nameCell {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.sku {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.editBtn, .deleteBtn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.editBtn {
+  background-color: #eff6ff;
+  color: var(--accent-color);
+}
+
+.editBtn:hover {
+  background-color: var(--accent-hover);
+  color: var(--white);
+}
+
+.deleteBtn {
+  background-color: #fee2e2;
+  color: var(--danger);
+}
+
+.deleteBtn:hover {
+  background-color: var(--danger-hover);
+  color: var(--white);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 32px !important;
+  color: var(--text-light);
+}

@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.qtyInput {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+}
+
+.noteInput {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+}
+
+.qtyInput:focus, .noteInput:focus {
+  border-color: var(--accent-color);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.addBtn, .removeBtn {
+  flex: 1;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.addBtn {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.addBtn:hover {
+  background-color: #bbf7d0;
+}
+
+.removeBtn {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.removeBtn:hover {
+  background-color: #fecaca;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 11px;
+}
