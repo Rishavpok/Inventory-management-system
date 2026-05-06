@@ -18,7 +18,8 @@ export const Sidebar: React.FC = () => {
     { section: "MAIN", items: [{ label: "Dashboard", to: "/", icon: "grid", end: true }] },
     { section: "INVENTORY", items: [
       { label: "Products", to: "/products", icon: "box" },
-      { label: "Stock Management", to: "/stock", icon: "layers" }
+      { label: "Stock Management", to: "/stock", icon: "layers" },
+      { label: "Branches", to: "/branches", icon: "map-pin" }
     ]},
     { section: "COMMERCE", items: [
       { label: "Sales", to: "/sales", icon: "trending-up" },
@@ -37,6 +38,7 @@ export const Sidebar: React.FC = () => {
       case "trending-up": return "📈";
       case "file-text": return "📄";
       case "user": return "👤";
+      case "map-pin": return "📍";
       default: return "•";
     }
   };

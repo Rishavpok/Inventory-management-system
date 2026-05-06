@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useInventoryStore } from '../store/inventoryStore';
+import { useBranchStore } from '../store/branchStore';
 import type { Sale } from '../types';
 import styles from './SaleForm.module.css';
 
 export const SaleForm: React.FC = () => {
   const { products, recordSale } = useInventoryStore();
+  const { branches } = useBranchStore();
 
   const [productId, setProductId] = useState('');
   const [qty, setQty] = useState('');
+  const [branch, setBranch] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'Digital'>('Cash');
   const [error, setError] = useState('');
 
   const selectedProduct = products.find(p => p.id === productId);
@@ -43,13 +47,18 @@ export const SaleForm: React.FC = () => {
       productName: selectedProduct.name,
       quantity: amount,
       pricePerUnit: selectedProduct.price,
+      costPrice: selectedProduct.costPrice,
       total: amount * selectedProduct.price,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      branch: branch || undefined,
+      paymentMethod
     };
 
     recordSale(sale);
     setProductId('');
     setQty('');
+    setBranch('');
+    setPaymentMethod('Cash');
   };
 
   return (
@@ -87,6 +96,24 @@ export const SaleForm: React.FC = () => {
             }} 
             placeholder="e.g. 2"
           />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="branch">Store/Branch</label>
+          <select id="branch" value={branch} onChange={e => setBranch(e.target.value)}>
+            <option value="">-- Select Branch --</option>
+            {branches.map(b => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="paymentMethod">Payment Method</label>
+          <select id="paymentMethod" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value as 'Cash' | 'Digital')}>
+            <option value="Cash">Cash</option>
+            <option value="Digital">Digital</option>
+          </select>
         </div>
 
         {selectedProduct && qty && !error && (

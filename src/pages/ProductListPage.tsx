@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInventoryStore } from '../store/inventoryStore';
+import { useBranchStore } from '../store/branchStore';
 import { ProductTable } from '../components/ProductTable';
 import { Pagination } from '../components/Pagination';
 import type { Category } from '../types';
@@ -8,10 +9,12 @@ import styles from './ProductListPage.module.css';
 
 export const ProductListPage: React.FC = () => {
   const { products, deleteProduct } = useInventoryStore();
+  const { branches } = useBranchStore();
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
+  const [selectedBranch, setSelectedBranch] = useState<string>('All');
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -26,13 +29,14 @@ export const ProductListPage: React.FC = () => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                             product.sku.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+      const matchesBranch = selectedBranch === 'All' || product.branch === selectedBranch;
+      return matchesSearch && matchesCategory && matchesBranch;
     });
-  }, [products, searchTerm, selectedCategory]);
+  }, [products, searchTerm, selectedCategory, selectedBranch]);
 
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, pageSize]);
+  }, [searchTerm, selectedCategory, selectedBranch, pageSize]);
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -63,6 +67,16 @@ export const ProductListPage: React.FC = () => {
           >
             {categories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+          <select 
+            value={selectedBranch} 
+            onChange={(e) => setSelectedBranch(e.target.value)}
+            className={styles.categorySelect}
+          >
+            <option value="All">All Branches</option>
+            {branches.map(b => (
+              <option key={b} value={b}>{b}</option>
             ))}
           </select>
         </div>

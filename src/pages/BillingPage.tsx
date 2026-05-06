@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useBillingStore } from '../store/billingStore';
 import { useInventoryStore } from '../store/inventoryStore';
+import { useBranchStore } from '../store/branchStore';
 import { Pagination } from '../components/Pagination';
 import { generateInvoicePDF, generateBillingReportPDF } from '../utils/pdfGenerator';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +11,7 @@ import styles from './BillingPage.module.css';
 export const BillingPage: React.FC = () => {
   const { billingRecords, updateBillingStatus, deleteBillingRecord, addBillingRecord } = useBillingStore();
   const { products, updateStock, recordSale } = useInventoryStore();
+  const { branches } = useBranchStore();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<BillingStatus | 'All'>('All');
@@ -21,7 +23,7 @@ export const BillingPage: React.FC = () => {
   // Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    customerName: '', customerEmail: '', productId: '', quantity: 1, status: 'Unpaid' as BillingStatus, notes: ''
+    customerName: '', customerEmail: '', productId: '', quantity: 1, status: 'Unpaid' as BillingStatus, notes: '', branch: '', paymentMethod: 'Cash' as 'Cash' | 'Digital'
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -105,7 +107,9 @@ export const BillingPage: React.FC = () => {
       total,
       status: formData.status,
       notes: formData.notes,
-      date: now
+      date: now,
+      branch: formData.branch || undefined,
+      paymentMethod: formData.paymentMethod
     };
 
     updateStock(formData.productId, 'decrease', formData.quantity, `Invoice ${newId}`);
@@ -115,13 +119,16 @@ export const BillingPage: React.FC = () => {
       productName: selectedProduct!.name,
       quantity: formData.quantity,
       pricePerUnit: selectedProduct!.price,
+      costPrice: selectedProduct!.costPrice,
       total,
-      date: now
+      date: now,
+      branch: formData.branch || undefined,
+      paymentMethod: formData.paymentMethod
     });
     addBillingRecord(record);
 
     setIsModalOpen(false);
-    setFormData({ customerName: '', customerEmail: '', productId: '', quantity: 1, status: 'Unpaid', notes: '' });
+    setFormData({ customerName: '', customerEmail: '', productId: '', quantity: 1, status: 'Unpaid', notes: '', branch: '', paymentMethod: 'Cash' });
     setErrors({});
   };
 
@@ -266,6 +273,20 @@ export const BillingPage: React.FC = () => {
                     <option value="Unpaid">Unpaid</option>
                     <option value="Paid">Paid</option>
                     <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Store/Branch</label>
+                  <select value={formData.branch} onChange={e => setFormData({...formData, branch: e.target.value})}>
+                    <option value="">-- Select Branch --</option>
+                    {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Payment Method</label>
+                  <select value={formData.paymentMethod} onChange={e => setFormData({...formData, paymentMethod: e.target.value as 'Cash' | 'Digital'})}>
+                    <option value="Cash">Cash</option>
+                    <option value="Digital">Digital</option>
                   </select>
                 </div>
                 <div className={styles.formGroupFull}>

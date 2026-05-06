@@ -51,6 +51,46 @@ export const DashboardPage: React.FC = () => {
     return Object.entries(data).map(([name, value]) => ({ name, value }));
   }, [sales, products]);
 
+  // 5. Margin Metrics
+  const marginMetrics = useMemo(() => {
+    let totalRevenue = 0;
+    let totalCost = 0;
+    const productMargin: Record<string, {name: string, margin: number}> = {};
+
+    sales.forEach(s => {
+      const rev = s.total;
+      const cost = (s.costPrice || 0) * s.quantity;
+      totalRevenue += rev;
+      totalCost += cost;
+
+      if (!productMargin[s.productId]) {
+        productMargin[s.productId] = { name: s.productName, margin: 0 };
+      }
+      productMargin[s.productId].margin += (rev - cost);
+    });
+
+    const grossMargin = totalRevenue - totalCost;
+    const marginPercent = totalRevenue > 0 ? (grossMargin / totalRevenue) * 100 : 0;
+    
+    const topMarginProducts = Object.values(productMargin).sort((a, b) => b.margin - a.margin).slice(0, 5);
+
+    return { totalRevenue, grossMargin, marginPercent, topMarginProducts };
+  }, [sales]);
+
+  // 6. Payment Breakdown
+  const paymentBreakdown = useMemo(() => {
+    let cash = 0;
+    let digital = 0;
+    sales.forEach(s => {
+      if (s.paymentMethod === 'Cash') cash += s.total;
+      else digital += s.total;
+    });
+    return [
+      { name: 'Cash', value: cash },
+      { name: 'Digital', value: digital }
+    ];
+  }, [sales]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -69,6 +109,26 @@ export const DashboardPage: React.FC = () => {
       <div className={styles.header}>
         <h2>Analytics Dashboard</h2>
       </div>
+
+      <motion.div 
+        className={styles.summaryGrid}
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.div variants={itemVariants} className={styles.summaryCard}>
+          <span className={styles.summaryTitle}>Total Gross Margin</span>
+          <span className={styles.summaryValue}>${marginMetrics.grossMargin.toFixed(2)}</span>
+        </motion.div>
+        <motion.div variants={itemVariants} className={styles.summaryCard} style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+          <span className={styles.summaryTitle}>Margin %</span>
+          <span className={styles.summaryValue}>{marginMetrics.marginPercent.toFixed(1)}%</span>
+        </motion.div>
+        <motion.div variants={itemVariants} className={styles.summaryCard} style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+          <span className={styles.summaryTitle}>Total Revenue</span>
+          <span className={styles.summaryValue}>${marginMetrics.totalRevenue.toFixed(2)}</span>
+        </motion.div>
+      </motion.div>
 
       <motion.div 
         className={styles.chartsGrid}
@@ -132,6 +192,36 @@ export const DashboardPage: React.FC = () => {
                 <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
                 <Line type="monotone" dataKey="total" stroke="#ed64a6" strokeWidth={3} activeDot={{ r: 8 }} />
               </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        <motion.div variants={itemVariants} className={styles.chartCard}>
+          <h3>Top 5 Product Margins</h3>
+          <div className={styles.chartWrapper}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart layout="vertical" data={marginMetrics.topMarginProducts} margin={{ top: 20, right: 30, left: 50, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" tick={{fontSize: 11}} width={100} />
+                <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
+                <Bar dataKey="margin" fill="#10b981" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        <motion.div variants={itemVariants} className={styles.chartCard}>
+          <h3>Payment Methods</h3>
+          <div className={styles.chartWrapper}>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie data={paymentBreakdown} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100} label>
+                  {paymentBreakdown.map((_, index) => <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#6366f1'} />)}
+                </Pie>
+                <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
+                <Legend />
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </motion.div>

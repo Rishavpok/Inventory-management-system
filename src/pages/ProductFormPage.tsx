@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useInventoryStore } from '../store/inventoryStore';
+import { useBranchStore } from '../store/branchStore';
 import type { Category, Product } from '../types';
 import styles from './ProductFormPage.module.css';
 
@@ -9,6 +10,7 @@ export const ProductFormPage: React.FC = () => {
   const isEdit = Boolean(id);
   
   const { products, addProduct, updateProduct } = useInventoryStore();
+  const { branches } = useBranchStore();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -16,8 +18,10 @@ export const ProductFormPage: React.FC = () => {
     category: 'Smartphones' as Category,
     brand: '',
     price: '',
+    costPrice: '',
     stock: '',
-    sku: ''
+    sku: '',
+    branch: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,8 +35,10 @@ export const ProductFormPage: React.FC = () => {
           category: product.category,
           brand: product.brand,
           price: product.price.toString(),
+          costPrice: product.costPrice?.toString() || '',
           stock: product.stock.toString(),
-          sku: product.sku
+          sku: product.sku,
+          branch: product.branch || ''
         });
       }
     }
@@ -66,6 +72,13 @@ export const ProductFormPage: React.FC = () => {
       newErrors.price = 'Price must be greater than 0';
     }
 
+    if (formData.costPrice) {
+      const costVal = parseFloat(formData.costPrice);
+      if (isNaN(costVal) || costVal < 0) {
+        newErrors.costPrice = 'Cost price cannot be negative';
+      }
+    }
+
     const stockVal = parseInt(formData.stock, 10);
     if (!formData.stock) {
       newErrors.stock = 'Stock is required';
@@ -87,8 +100,10 @@ export const ProductFormPage: React.FC = () => {
         category: formData.category,
         brand: formData.brand,
         price: parseFloat(formData.price),
+        costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
         stock: parseInt(formData.stock, 10),
         sku: formData.sku,
+        branch: formData.branch || undefined,
         createdAt: isEdit ? products.find(p => p.id === id)!.createdAt : new Date().toISOString()
       };
 
@@ -139,6 +154,14 @@ export const ProductFormPage: React.FC = () => {
             </div>
 
             <div className={styles.formGroup}>
+              <label htmlFor="costPrice">Cost Price (USD)</label>
+              <input id="costPrice" name="costPrice" type="number" step="0.01" value={formData.costPrice} onChange={handleChange} />
+              {errors.costPrice && <span className={styles.error}>{errors.costPrice}</span>}
+            </div>
+          </div>
+
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
               <label htmlFor="stock">Initial Stock</label>
               <input id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} disabled={isEdit} />
               {errors.stock && <span className={styles.error}>{errors.stock}</span>}
@@ -146,10 +169,22 @@ export const ProductFormPage: React.FC = () => {
             </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="sku">SKU</label>
-            <input id="sku" name="sku" value={formData.sku} onChange={handleChange} />
-            {errors.sku && <span className={styles.error}>{errors.sku}</span>}
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
+              <label htmlFor="sku">SKU</label>
+              <input id="sku" name="sku" value={formData.sku} onChange={handleChange} />
+              {errors.sku && <span className={styles.error}>{errors.sku}</span>}
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="branch">Store/Branch</label>
+              <select id="branch" name="branch" value={formData.branch} onChange={handleChange}>
+                <option value="">-- No Branch --</option>
+                {branches.map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className={styles.actions}>

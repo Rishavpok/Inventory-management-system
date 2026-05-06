@@ -9,8 +9,10 @@ export interface Product {
   category: Category;
   brand: string;
   price: number;
+  costPrice?: number;
   stock: number;
   sku: string;
+  branch?: string;
   createdAt: string;
 }
 
@@ -30,8 +32,11 @@ export interface Sale {
   productName: string;
   quantity: number;
   pricePerUnit: number;
+  costPrice?: number;
   total: number;
   date: string;
+  branch?: string;
+  paymentMethod?: "Cash" | "Digital";
 }
 
 export type BillingStatus = "Paid" | "Unpaid" | "Cancelled";
@@ -48,6 +53,8 @@ export interface BillingRecord {
   status: BillingStatus;
   notes?: string;
   date: string;
+  branch?: string;
+  paymentMethod?: "Cash" | "Digital";
 }
 
 export interface ProfileData {

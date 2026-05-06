@@ -13,6 +13,7 @@ import { StockPage } from './pages/StockPage';
 import { SalesPage } from './pages/SalesPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 import { BillingPage } from './pages/BillingPage';
+import { BranchManagementPage } from './pages/BranchManagementPage';
 
 import styles from './App.module.css';
 
@@ -26,6 +27,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   if (location.pathname === '/sales') headerTitle = 'Sales';
   if (location.pathname === '/profile') headerTitle = 'User Profile';
   if (location.pathname === '/billing') headerTitle = 'Billing';
+  if (location.pathname === '/branches') headerTitle = 'Branch Management';
 
   return (
     <div className={styles.appContainer}>
@@ -69,6 +71,7 @@ function App() {
                   <Route path="/sales" element={<SalesPage />} />
                   <Route path="/profile" element={<UserProfilePage />} />
                   <Route path="/billing" element={<BillingPage />} />
+                  <Route path="/branches" element={<BranchManagementPage />} />
                 </Routes>
               </AppLayout>
             </ProtectedRoute>
